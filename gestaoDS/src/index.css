@@ -5,17 +5,15 @@ body {
   background-color: #f6f6f6;
 }
 
-/* Estilo para WebKit (Chrome, Safari, Opera) */
 ::-webkit-scrollbar {
-  width: 8px; /* Largura da barra de rolagem */
+  width: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #136cdc; /* Cor da barra de rolagem */
-  border-radius: 4px; /* Raio das bordas da barra de rolagem */
+  background-color: #136cdc; 
+  border-radius: 4px; 
 }
 
-/* Estilo para Firefox */
 ::-moz-scrollbar {
   width: 8px;
 }
@@ -25,7 +23,6 @@ body {
   border-radius: 4px;
 }
 
-/* Estilo para Edge */
 ::-ms-scrollbar {
   width: 8px;
 }

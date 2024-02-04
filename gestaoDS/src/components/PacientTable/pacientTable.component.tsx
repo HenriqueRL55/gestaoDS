@@ -12,6 +12,10 @@ import AddIcon from "@mui/icons-material/Add";
 import { FormControl, OutlinedInput, InputAdornment } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import Menu from "@mui/material/Menu";
+import Modal from "@mui/material/Modal";
+import MenuItem from "@mui/material/MenuItem";
+
 import PacientModal from "../Modal/modal.component";
 import {
   SearchContainer,
@@ -21,11 +25,11 @@ import {
 
 interface Data {
   id: number;
-  name: string;
+  paciente: string;
   cpf: number;
-  birthDate: string;
+  nascimento: string;
   email: string;
-  city: string;
+  cidade: string;
   actions: JSX.Element;
 }
 
@@ -36,159 +40,12 @@ interface HeadCell {
 
 type Actions = "actions";
 
-function createData(
-  id: number,
-  name: string,
-  cpf: number,
-  birthDate: string,
-  email: string,
-  city: string,
-  actions: JSX.Element
-): Data {
-  return { id, name, cpf, birthDate, email, city, actions };
-}
-
-const rows: Data[] = [
-  createData(
-    1,
-    "João",
-    12345678901,
-    "01/01/1990",
-    "cupcake@example.com",
-    "City A",
-    <div>
-      <MoreHorizIcon sx={{ cursor: "pointer" }} />
-    </div>
-  ),
-  createData(
-    2,
-    "Pedro",
-    23456789012,
-    "02/02/1991",
-    "donut@example.com",
-    "City B",
-    <div>
-      <MoreHorizIcon sx={{ cursor: "pointer" }} />
-    </div>
-  ),
-  createData(
-    1,
-    "João",
-    12345678901,
-    "01/01/1990",
-    "cupcake@example.com",
-    "City A",
-    <div>
-      <MoreHorizIcon sx={{ cursor: "pointer" }} />
-    </div>
-  ),
-  createData(
-    2,
-    "Pedro",
-    23456789012,
-    "02/02/1991",
-    "donut@example.com",
-    "City B",
-    <div>
-      <MoreHorizIcon sx={{ cursor: "pointer" }} />
-    </div>
-  ),
-  createData(
-    1,
-    "João",
-    12345678901,
-    "01/01/1990",
-    "cupcake@example.com",
-    "City A",
-    <div>
-      <MoreHorizIcon sx={{ cursor: "pointer" }} />
-    </div>
-  ),
-  createData(
-    2,
-    "Pedro",
-    23456789012,
-    "02/02/1991",
-    "donut@example.com",
-    "City B",
-    <div>
-      <MoreHorizIcon sx={{ cursor: "pointer" }} />
-    </div>
-  ),
-  createData(
-    1,
-    "João",
-    12345678901,
-    "01/01/1990",
-    "cupcake@example.com",
-    "City A",
-    <div>
-      <MoreHorizIcon sx={{ cursor: "pointer" }} />
-    </div>
-  ),
-  createData(
-    2,
-    "Pedro",
-    23456789012,
-    "02/02/1991",
-    "donut@example.com",
-    "City B",
-    <div>
-      <MoreHorizIcon sx={{ cursor: "pointer" }} />
-    </div>
-  ),
-  createData(
-    1,
-    "João",
-    12345678901,
-    "01/01/1990",
-    "cupcake@example.com",
-    "City A",
-    <div>
-      <MoreHorizIcon sx={{ cursor: "pointer" }} />
-    </div>
-  ),
-  createData(
-    2,
-    "Pedro",
-    23456789012,
-    "02/02/1991",
-    "donut@example.com",
-    "City B",
-    <div>
-      <MoreHorizIcon sx={{ cursor: "pointer" }} />
-    </div>
-  ),
-  createData(
-    1,
-    "João",
-    12345678901,
-    "01/01/1990",
-    "cupcake@example.com",
-    "City A",
-    <div>
-      <MoreHorizIcon sx={{ cursor: "pointer" }} />
-    </div>
-  ),
-  createData(
-    2,
-    "Pedro",
-    23456789012,
-    "02/02/1991",
-    "donut@example.com",
-    "City B",
-    <div>
-      <MoreHorizIcon sx={{ cursor: "pointer" }} />
-    </div>
-  ),
-];
-
 const headCells: HeadCell[] = [
-  { id: "name", label: "Nome" },
+  { id: "paciente", label: "Nome" },
   { id: "cpf", label: "CPF" },
-  { id: "birthDate", label: "Data de Nascimento" },
+  { id: "nascimento", label: "Data de Nascimento" },
   { id: "email", label: "E-mail" },
-  { id: "city", label: "Cidade" },
+  { id: "cidade", label: "Cidade" },
   { id: "actions" as Actions, label: "Ações" },
 ];
 
@@ -235,26 +92,48 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 
 export default function PacientTable() {
   const [order, setOrder] = useState<Order>("asc");
-  const [orderBy, setOrderBy] = useState<keyof Data>("name");
+  const [orderBy, setOrderBy] = useState<keyof Data>("paciente");
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredRows, setFilteredRows] = useState(rows);
+  const [pacients, setPacients] = useState<Data[]>([]);
+  const [filteredRows, setFilteredRows] = useState(pacients);
   const [modalOpen, setModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+ 
+  useEffect(() => {
+    const storedPacients = localStorage.getItem("pacientData");
+    if (storedPacients) {
+      setPacients(JSON.parse(storedPacients));
+    }
+  }, []);
+
+  const handleClick = (event: React.MouseEvent<SVGSVGElement>) => {
+    setAnchorEl(event.currentTarget as unknown as HTMLElement);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const handleOpenModal = () => setModalOpen(true);
   const handleCloseModal = () => setModalOpen(false);
 
+  const handleOpenDeleteModal = () => setDeleteModalOpen(true);
+  const handleCloseDeleteModal = () => setDeleteModalOpen(false);
+
   useEffect(() => {
     setFilteredRows(
-      rows.filter(
+      pacients.filter(
         (row) =>
-          row.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          row.cpf.toString().includes(searchTerm) ||
-          row.birthDate.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          row.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          row.city.toLowerCase().includes(searchTerm.toLowerCase())
+          row.paciente?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          row.cpf?.toString().includes(searchTerm) ||
+          row.nascimento?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          row.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          row.cidade?.toLowerCase().includes(searchTerm.toLowerCase())
       )
     );
-  }, [searchTerm]);
+  }, [searchTerm, pacients]);
 
   const handleRequestSort = (property: keyof Data) => {
     const isAsc = orderBy === property && order === "asc";
@@ -312,6 +191,14 @@ export default function PacientTable() {
         </AddSearch>
       </SearchContainer>
       <PacientModal open={modalOpen} handleClose={handleCloseModal} />
+      <Modal
+        open={deleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <div>teste</div>
+      </Modal>
       <TableContainer sx={{ maxHeight: "30rem" }}>
         <Table aria-labelledby="tableTitle" size="medium">
           <EnhancedTableHead
@@ -319,17 +206,36 @@ export default function PacientTable() {
             orderBy={orderBy}
             onRequestSort={handleRequestSort}
           />
-          {filteredRows.map((row) => (
+          {filteredRows.map((row, index) => (
             <TableBody>
               <TableRow key={row.id}>
                 <TableCell sx={{ color: "#136CDC", fontWeight: "400" }}>
-                  {row.name}
+                  {row.paciente}
                 </TableCell>
                 <TableCell>{row.cpf}</TableCell>
-                <TableCell>{row.birthDate}</TableCell>
+                <TableCell>
+                  {new Date(row.nascimento).toLocaleDateString("pt-BR")}
+                </TableCell>
                 <TableCell>{row.email}</TableCell>
-                <TableCell>{row.city}</TableCell>
-                <TableCell>{row.actions}</TableCell>
+                <TableCell>{row.cidade}</TableCell>
+                <TableCell>
+                  <MoreHorizIcon
+                    aria-controls={`simple-menu-${index}`}
+                    aria-haspopup="true"
+                    onClick={handleClick}
+                    sx={{ cursor: "pointer" }}
+                  />
+                  <Menu
+                    id={`simple-menu-${index}`}
+                    anchorEl={anchorEl}
+                    keepMounted
+                    open={Boolean(anchorEl)}
+                    onClose={handleClose}
+                  >
+                    <MenuItem onClick={handleClose}>Editar</MenuItem>
+                    <MenuItem onClick={handleOpenDeleteModal}>Excluir</MenuItem>
+                  </Menu>
+                </TableCell>
               </TableRow>
             </TableBody>
           ))}

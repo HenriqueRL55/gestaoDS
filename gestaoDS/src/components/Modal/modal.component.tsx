@@ -81,6 +81,56 @@ function a11yProps(index: number) {
 export default function PacientModal({ open, handleClose }: PacientModalProps) {
   const [value, setValue] = useState(0);
   const [valueDate, setValueDate] = useState<Dayjs | null>(dayjs());
+  const [pacientData, setPacientData] = useState({
+    paciente: "",
+    apelido: "",
+    nacionalidade: "",
+    nascimento: null,
+    cpf: "",
+    email: "",
+    rg: "",
+    genero: " ",
+    estadoCivil: " ",
+    observacoes: "",
+    cep: "",
+    cidade: "",
+    uf: "",
+    endereco: "",
+    numero: "",
+    bairro: "",
+    complemento: "",
+  });
+
+  const handleSubmit = () => {
+    const existingDataString = localStorage.getItem("pacientData");
+    let existingData = existingDataString ? JSON.parse(existingDataString) : [];
+
+    if (!Array.isArray(existingData)) {
+      existingData = [];
+    }
+
+    const newData = [...existingData, pacientData];
+    localStorage.setItem("pacientData", JSON.stringify(newData));
+    handleClose();
+  };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPacientData({
+      ...pacientData,
+      [event.target.id]: event.target.value,
+    });
+  };
+
+  const handleAutocompleteChange = (
+    event: any,
+    newValue: string | null,
+    id: string
+  ) => {
+    setPacientData({
+      ...pacientData,
+      [id]: newValue || "",
+    });
+  };
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -130,10 +180,10 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
                 <FieldTitle>Paciente:</FieldTitle>
                 <FormControl variant="outlined">
                   <OutlinedInput
-                    id="search-input"
+                    id="paciente"
                     placeholder="Digite"
-                    //   value={searchTerm}
-                    //   onChange={(event) => setSearchTerm(event.target.value)}
+                    value={pacientData.paciente}
+                    onChange={handleInputChange}
                   />
                 </FormControl>
               </Pacient>
@@ -141,10 +191,10 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
                 <FieldTitle>Apelido:</FieldTitle>
                 <FormControl variant="outlined">
                   <OutlinedInput
-                    id="search-input"
+                    id="apelido"
                     placeholder="Digite"
-                    //   value={searchTerm}
-                    //   onChange={(event) => setSearchTerm(event.target.value)}
+                    value={pacientData.apelido}
+                    onChange={handleInputChange}
                   />
                 </FormControl>
               </NickName>
@@ -152,10 +202,10 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
                 <FieldTitle>Nacionalidade:</FieldTitle>
                 <FormControl variant="outlined">
                   <OutlinedInput
-                    id="search-input"
+                    id="nacionalidade"
                     placeholder="Digite"
-                    //   value={searchTerm}
-                    //   onChange={(event) => setSearchTerm(event.target.value)}
+                    value={pacientData.nacionalidade}
+                    onChange={handleInputChange}
                   />
                 </FormControl>
               </Nacionality>
@@ -167,8 +217,10 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
                   <DemoContainer components={["DatePicker"]}>
                     <DatePicker
                       sx={{ width: "100%" }}
-                      value={valueDate}
-                      onChange={(newValue) => setValueDate(newValue)}
+                      value={pacientData.nascimento}
+                      onChange={(newValue) =>
+                        setPacientData({ ...pacientData, nascimento: newValue })
+                      }
                     />
                   </DemoContainer>
                 </LocalizationProvider>
@@ -177,10 +229,10 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
                 <FieldTitle>CPF:</FieldTitle>
                 <FormControl variant="outlined">
                   <OutlinedInput
-                    id="search-input"
+                    id="cpf"
                     placeholder="Digite"
-                    //   value={searchTerm}
-                    //   onChange={(event) => setSearchTerm(event.target.value)}
+                    value={pacientData.cpf}
+                    onChange={handleInputChange}
                   />
                 </FormControl>
               </CPF>
@@ -188,10 +240,10 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
                 <FieldTitle>RG:</FieldTitle>
                 <FormControl variant="outlined">
                   <OutlinedInput
-                    id="search-input"
+                    id="rg"
                     placeholder="Digite"
-                    //   value={searchTerm}
-                    //   onChange={(event) => setSearchTerm(event.target.value)}
+                    value={pacientData.rg}
+                    onChange={handleInputChange}
                   />
                 </FormControl>
               </RG>
@@ -199,9 +251,13 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
                 <FieldTitle>Gênero:</FieldTitle>
                 <Autocomplete
                   disablePortal
-                  id="combo-box-demo"
+                  id="genero"
                   options={["Masculino", "Feminino", "Não Definido"]}
                   sx={{ width: "100%" }}
+                  value={pacientData.genero}
+                  onChange={(event, newValue) =>
+                    handleAutocompleteChange(event, newValue, "genero")
+                  }
                   renderInput={(params) => (
                     <TextField {...params} placeholder="Selecione" />
                   )}
@@ -211,7 +267,7 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
                 <FieldTitle>Estado Civil:</FieldTitle>
                 <Autocomplete
                   disablePortal
-                  id="combo-box-demo"
+                  id="estadoCivil"
                   options={[
                     "Solteiro",
                     "Casado",
@@ -220,6 +276,10 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
                     "Viúvo",
                   ]}
                   sx={{ width: "19.5rem" }}
+                  value={pacientData.estadoCivil}
+                  onChange={(event, newValue) =>
+                    handleAutocompleteChange(event, newValue, "estadoCivil")
+                  }
                   renderInput={(params) => (
                     <TextField {...params} placeholder="Selecione" />
                   )}
@@ -229,11 +289,11 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
                 <FieldTitle>Observações adicionais:</FieldTitle>
                 <FormControl variant="outlined">
                   <OutlinedInput
-                    id="search-input"
+                    id="observacoes"
                     placeholder="Digite"
-                    sx={{ height: "100px" }} // Adjust this value as needed
-                    // value={searchTerm}
-                    // onChange={(event) => setSearchTerm(event.target.value)}
+                    sx={{ height: "100px" }}
+                    value={pacientData.observacoes}
+                    onChange={handleInputChange}
                   />
                 </FormControl>
               </Observation>
@@ -248,10 +308,10 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
                 <FieldTitle>CEP:</FieldTitle>
                 <FormControl variant="outlined">
                   <OutlinedInput
-                    id="search-input"
+                    id="cep"
                     placeholder="Digite"
-                    //   value={searchTerm}
-                    //   onChange={(event) => setSearchTerm(event.target.value)}
+                    value={pacientData.cep}
+                    onChange={handleInputChange}
                   />
                 </FormControl>
               </CEP>
@@ -259,10 +319,10 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
                 <FieldTitle>Cidade:</FieldTitle>
                 <FormControl variant="outlined">
                   <OutlinedInput
-                    id="search-input"
+                    id="cidade"
                     placeholder="Digite"
-                    //   value={searchTerm}
-                    //   onChange={(event) => setSearchTerm(event.target.value)}
+                    value={pacientData.cidade}
+                    onChange={handleInputChange}
                   />
                 </FormControl>
               </City>
@@ -270,10 +330,10 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
                 <FieldTitle>UF:</FieldTitle>
                 <FormControl variant="outlined">
                   <OutlinedInput
-                    id="search-input"
+                    id="uf"
                     placeholder="Digite"
-                    //   value={searchTerm}
-                    //   onChange={(event) => setSearchTerm(event.target.value)}
+                    value={pacientData.uf}
+                    onChange={handleInputChange}
                   />
                 </FormControl>
               </UF>
@@ -281,10 +341,10 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
                 <FieldTitle>Endereço:</FieldTitle>
                 <FormControl variant="outlined">
                   <OutlinedInput
-                    id="search-input"
+                    id="endereco"
                     placeholder="Digite"
-                    //   value={searchTerm}
-                    //   onChange={(event) => setSearchTerm(event.target.value)}
+                    value={pacientData.endereco}
+                    onChange={handleInputChange}
                   />
                 </FormControl>
               </Adress>
@@ -292,10 +352,10 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
                 <FieldTitle>Número:</FieldTitle>
                 <FormControl variant="outlined">
                   <OutlinedInput
-                    id="search-input"
+                    id="numero"
                     placeholder="Digite"
-                    //   value={searchTerm}
-                    //   onChange={(event) => setSearchTerm(event.target.value)}
+                    value={pacientData.numero}
+                    onChange={handleInputChange}
                   />
                 </FormControl>
               </Number>
@@ -303,10 +363,10 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
                 <FieldTitle>Bairro:</FieldTitle>
                 <FormControl variant="outlined">
                   <OutlinedInput
-                    id="search-input"
+                    id="bairro"
                     placeholder="Digite"
-                    //   value={searchTerm}
-                    //   onChange={(event) => setSearchTerm(event.target.value)}
+                    value={pacientData.bairro}
+                    onChange={handleInputChange}
                   />
                 </FormControl>
               </Neighb>
@@ -314,14 +374,14 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
                 <FieldTitle>Complemento:</FieldTitle>
                 <FormControl variant="outlined">
                   <OutlinedInput
-                    id="search-input"
+                    id="complemento"
                     placeholder="Digite"
-                    //   value={searchTerm}
-                    //   onChange={(event) => setSearchTerm(event.target.value)}
+                    value={pacientData.complemento}
+                    onChange={handleInputChange}
                   />
                 </FormControl>
               </Complement>
-              <SubmitButton>Salvar</SubmitButton>
+              <SubmitButton onClick={handleSubmit}>Salvar</SubmitButton>
             </ContactContainer>
           </CustomTabPanel>
         </Box>
