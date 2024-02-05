@@ -17,8 +17,11 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 
+/* MUI Icons */
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+
 /* Dayjs */
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 
 /* Styled Components */
 import {
@@ -313,7 +316,9 @@ export default function PacientModal({
           </Box>
           <CustomTabPanel value={value} index={0}>
             <BasicInformationContainer>
-              <Photo>teste</Photo>
+              <Photo>
+                <AccountCircleIcon sx={{ fontSize: "60px" }} />
+              </Photo>
               <Pacient>
                 <FieldTitle>Paciente:</FieldTitle>
                 <FormControl variant="outlined">
