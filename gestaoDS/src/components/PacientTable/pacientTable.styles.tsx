@@ -4,6 +4,7 @@ import styled from "styled-components";
 export const Container = styled.div`
   width: 100%;
   border: 1px solid #E8E8E8;
+  background: #ffffff;
   margin: auto;
   border-radius: 6px;
   @media (max-width: 700px) {

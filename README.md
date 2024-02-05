@@ -34,6 +34,10 @@ npm run dev
 
 Agora, o servidor deve estar rodando localmente na sua máquina. Abra o navegador e acesse `http://localhost:3000` (ou a URL que for exibida no console) para ver o projeto.
 
+## Avisos
+
+O projeto está rodando localmente, então a tabela está iniciando vazia, cadastre pacientes para visualizar as funcionalidades do sistema!
+
 ## Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
