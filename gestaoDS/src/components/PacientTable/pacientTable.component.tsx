@@ -129,6 +129,7 @@ export default function PacientTable() {
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [selectedPatientIndex, setSelectedPatientIndex] = useState<number | null>(null);
 
   /* Verifica os Pacientes no localStorage*/
   useEffect(() => {

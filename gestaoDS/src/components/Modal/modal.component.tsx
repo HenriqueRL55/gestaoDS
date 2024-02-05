@@ -178,6 +178,7 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
     localStorage.setItem("pacientData", JSON.stringify(existingData));
     handleClose();
     setEditingIndex(null);
+    window.location.reload();
   };
 
   // Função chamada quando o valor de um campo de entrada muda
