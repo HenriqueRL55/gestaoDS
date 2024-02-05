@@ -1,4 +1,7 @@
+/* React Hooks */
 import { useState, useEffect } from "react";
+
+/* Material UI Components*/
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -7,18 +10,22 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
 import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add";
 import { FormControl, OutlinedInput, InputAdornment } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import Menu from "@mui/material/Menu";
 import Modal from "@mui/material/Modal";
 import MenuItem from "@mui/material/MenuItem";
-import CloseIcon from "@mui/icons-material/Close";
 
+/* Material UI Icons*/
+import SearchIcon from "@mui/icons-material/Search";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import CloseIcon from "@mui/icons-material/Close";
+import AddIcon from "@mui/icons-material/Add";
 import DeleteIconModal from "../../assets/DeleteIconModal.png";
 
+/* Components*/
 import PacientModal from "../Modal/modal.component";
+
+/* Styled Components*/
 import {
   SearchContainer,
   AddSearch,
@@ -39,6 +46,7 @@ import {
   NoData,
 } from "./pacientTable.styles";
 
+/* TypeScript Interfaces*/
 interface Data {
   id: number;
   paciente: string;
@@ -54,6 +62,15 @@ interface HeadCell {
   label: string;
 }
 
+type Order = "asc" | "desc";
+
+interface EnhancedTableProps {
+  order: Order;
+  orderBy: keyof Data;
+  onRequestSort: (property: keyof Data) => void;
+}
+
+/* Define Actions como um JSX Element para ser usado como um botão*/
 type Actions = "actions";
 
 const headCells: HeadCell[] = [
@@ -65,13 +82,7 @@ const headCells: HeadCell[] = [
   { id: "actions" as Actions, label: "Ações" },
 ];
 
-type Order = "asc" | "desc";
-
-interface EnhancedTableProps {
-  order: Order;
-  orderBy: keyof Data;
-  onRequestSort: (property: keyof Data) => void;
-}
+/* Retorna o Cabeçalho da Tabela de Pacientes*/
 
 function EnhancedTableHead(props: EnhancedTableProps) {
   const { order, orderBy, onRequestSort } = props;
@@ -109,6 +120,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 }
 
 export default function PacientTable() {
+  /* Declaração dos useStates*/
   const [order, setOrder] = useState<Order>("asc");
   const [orderBy, setOrderBy] = useState<keyof Data>("paciente");
   const [searchTerm, setSearchTerm] = useState("");
@@ -118,13 +130,15 @@ export default function PacientTable() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
+  /* Verifica os Pacientes no localStorage*/
   useEffect(() => {
     const storedPacients = localStorage.getItem("pacientData");
     if (storedPacients) {
       setPacients(JSON.parse(storedPacients));
     }
-  }, []);
+  }, [open]);
 
+  /* Deletar o Paciente */
   const DeletePacient = () => {
     // Obtém o índice do paciente a ser excluído
     const indexToDelete = parseInt(
@@ -144,24 +158,33 @@ export default function PacientTable() {
     // Atualiza o localStorage
     localStorage.setItem("pacientData", JSON.stringify(updatedPacients));
 
-    // Fecha o modal de exclusão
+    // Fecha o modal de exclusão ao excluir o Paciente
     handleCloseDeleteModal();
   };
 
+  /* Abre o Menu para selecionar Editar ou Excluir */
   const handleClick = (event: React.MouseEvent<SVGSVGElement>) => {
     setAnchorEl(event.currentTarget as unknown as HTMLElement);
   };
 
+  /* Fecha o Menu para selecionar Editar ou Excluir */
   const handleClose = () => {
     setAnchorEl(null);
   };
 
+  /* Abre Modal para Criar Paciente */
   const handleOpenModal = () => setModalOpen(true);
+
+  /* Fecha Modal para Criar Paciente */
   const handleCloseModal = () => setModalOpen(false);
 
+  /* Abre Modal para Deletar Paciente */
   const handleOpenDeleteModal = () => setDeleteModalOpen(true);
+
+  /* Fecha Modal para Deletar Paciente */
   const handleCloseDeleteModal = () => setDeleteModalOpen(false);
 
+  /* UseEffect para filtrar os dados da tabela através do campo de pesquisa */
   useEffect(() => {
     setFilteredRows(
       pacients.filter(
@@ -175,10 +198,31 @@ export default function PacientTable() {
     );
   }, [searchTerm, pacients]);
 
+  /* A função handleRequestSort é chamada quando o usuário clica em um cabeçalho de coluna para classificar a tabela. */
   const handleRequestSort = (property: keyof Data) => {
     const isAsc = orderBy === property && order === "asc";
+
     setOrder(isAsc ? "desc" : "asc");
+    // Define a coluna pela qual a tabela deve ser ordenada.
     setOrderBy(property);
+
+    const sortedPacients = [...filteredRows].sort((a, b) => {
+      const valueA = a[property];
+      const valueB = b[property];
+
+      if (typeof valueA === "string" && typeof valueB === "string") {
+        return isAsc
+          ? valueA.localeCompare(valueB)
+          : valueB.localeCompare(valueA);
+      }
+
+      return isAsc
+        ? (valueA as number) - (valueB as number)
+        : (valueB as number) - (valueA as number);
+    });
+
+    // Atualiza filteredRows com a lista ordenada de pacientes.
+    setFilteredRows(sortedPacients);
   };
 
   return (
@@ -282,8 +326,8 @@ export default function PacientTable() {
             </TableBody>
           ) : (
             filteredRows.map((row, index) => (
-              <TableBody>
-                <TableRow key={row.id}>
+              <TableBody key={row.id}>
+                <TableRow>
                   <TableCell sx={{ color: "#136CDC", fontWeight: "400" }}>
                     {row.paciente}
                   </TableCell>
@@ -299,7 +343,7 @@ export default function PacientTable() {
                       aria-haspopup="true"
                       onClick={(event) => {
                         handleClick(event);
-            
+
                         event.currentTarget.setAttribute(
                           "data-index",
                           index.toString()

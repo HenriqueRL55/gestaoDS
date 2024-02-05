@@ -1,18 +1,23 @@
+/* React Hooks */
 import { useState } from "react";
 
+/* Material UI Components */
 import Modal from "@mui/material/Modal";
 import { FormControl, OutlinedInput, CircularProgress } from "@mui/material";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
+
+/* Material UI Date Picker */
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 
+/* Styled Components */
 import {
   ModalContainer,
   BasicInformationContainer,
@@ -39,6 +44,7 @@ import {
   SubmitButton,
 } from "./modal.styles";
 
+/* TypeScript Interfaces*/
 interface PacientModalProps {
   open: boolean;
   handleClose: () => void;
@@ -50,6 +56,7 @@ interface TabPanelProps {
   value: number;
 }
 
+/* Tabs do Modal */
 function CustomTabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
 
@@ -78,6 +85,7 @@ function a11yProps(index: number) {
 }
 
 export default function PacientModal({ open, handleClose }: PacientModalProps) {
+  /* UseStates */
   const [value, setValue] = useState(0);
   const [pacientData, setPacientData] = useState({
     paciente: "",
@@ -113,6 +121,7 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
       if (data.erro) {
         console.error("CEP não encontrado");
       } else {
+        // Atualiza os dados do paciente com as informações retornadas pela API
         setPacientData((prevData) => ({
           ...prevData,
           cidade: data.localidade,
@@ -128,10 +137,12 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
     }
   };
 
+  // Função chamada quando o valor do campo CEP muda
   const handleCEPChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const cep = event.target.value.replace(/\D/g, "");
     setCepBeingEdited(true);
 
+    // Atualiza o CEP nos dados do paciente
     setPacientData((prevData) => ({
       ...prevData,
       cep: cep,
@@ -143,10 +154,12 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
     }
   };
 
+  // Função chamada quando o campo CEP perde o foco
   const handleCEPBlur = () => {
     setCepBeingEdited(false);
   };
 
+  // Função chamada quando o formulário é submetido
   const handleSubmit = () => {
     const existingDataString = localStorage.getItem("pacientData");
     let existingData = existingDataString ? JSON.parse(existingDataString) : [];
@@ -156,41 +169,48 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
     }
 
     if (editingIndex !== null) {
-  
       existingData[editingIndex] = pacientData;
     } else {
-  
       existingData = [...existingData, pacientData];
     }
 
+    // Atualiza o armazenamento local com os novos dados do paciente
     localStorage.setItem("pacientData", JSON.stringify(existingData));
     handleClose();
     setEditingIndex(null);
   };
 
+  // Função chamada quando o valor de um campo de entrada muda
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // Atualiza o valor correspondente nos dados do paciente
     setPacientData({
       ...pacientData,
       [event.target.id]: event.target.value,
     });
   };
 
+  // Função chamada quando o valor de um campo de autocomplete muda
   const handleAutocompleteChange = (
     event: any,
     newValue: string | null,
     id: string
   ) => {
+    // Atualiza o valor correspondente nos dados do paciente
     setPacientData({
       ...pacientData,
       [id]: newValue || "",
     });
   };
 
+  // Função chamada quando o valor de um componente controlado muda
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    // Atualiza o valor do estado correspondente
     setValue(newValue);
   };
 
+  // Função chamada quando o botão "Próximo" é clicado
   const handleNextButtonClick = () => {
+    // Atualiza o valor do estado para 1
     setValue(1);
   };
 

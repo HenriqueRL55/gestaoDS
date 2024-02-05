@@ -1,6 +1,4 @@
-/* React Hooks */
-
-/* images */
+/* Images */
 import gestaoDSLogo from "../assets/logo.png";
 
 /* Components */

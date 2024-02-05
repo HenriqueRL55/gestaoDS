@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const Container = styled.div`
   display: grid;
   width: 100%;
-  grid-template-rows: 0.5fr 3fr;
+  grid-template-rows: 0.3fr 3fr;
 `;
 
 export const LogoContainer = styled.img`
