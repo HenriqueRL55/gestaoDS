@@ -54,7 +54,7 @@ interface Data {
   nascimento: any;
   email: string;
   cidade: string;
-  apelido:string;
+  apelido: string;
   nacionalidade: string;
   rg: string;
   genero: string;
@@ -65,7 +65,7 @@ interface Data {
   endereco: string;
   numero: any;
   bairro: string;
-  complemento:string;
+  complemento: string;
   actions: JSX.Element;
 }
 

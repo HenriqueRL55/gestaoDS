@@ -17,6 +17,9 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 
+/* Dayjs */
+import dayjs from 'dayjs';
+
 /* Styled Components */
 import {
   ModalContainer,
@@ -352,9 +355,16 @@ export default function PacientModal({
                   <DemoContainer components={["DatePicker"]}>
                     <DatePicker
                       sx={{ width: "100%" }}
-                      value={pacientData.nascimento}
+                      value={
+                        pacientData.nascimento
+                          ? dayjs(pacientData.nascimento)
+                          : null
+                      }
                       onChange={(newValue) =>
-                        setPacientData({ ...pacientData, nascimento: newValue })
+                        setPacientData({
+                          ...pacientData,
+                          nascimento: newValue ? newValue.toISOString() : null,
+                        })
                       }
                     />
                   </DemoContainer>
