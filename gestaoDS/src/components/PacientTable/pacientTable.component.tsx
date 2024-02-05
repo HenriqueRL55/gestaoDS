@@ -50,10 +50,22 @@ import {
 interface Data {
   id: number;
   paciente: string;
-  cpf: number;
-  nascimento: string;
+  cpf: any;
+  nascimento: any;
   email: string;
   cidade: string;
+  apelido:string;
+  nacionalidade: string;
+  rg: string;
+  genero: string;
+  estadoCivil: string;
+  observacoes: string;
+  cep: string;
+  uf: string;
+  endereco: string;
+  numero: any;
+  bairro: string;
+  complemento:string;
   actions: JSX.Element;
 }
 
@@ -129,7 +141,12 @@ export default function PacientTable() {
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [selectedPatientIndex, setSelectedPatientIndex] = useState<number | null>(null);
+  const [selectedPatientIndex, setSelectedPatientIndex] = useState<
+    number | null
+  >(null);
+  const [editingPatientData, setEditingPatientData] = useState<Data | null>(
+    null
+  );
 
   /* Verifica os Pacientes no localStorage*/
   useEffect(() => {
@@ -275,7 +292,11 @@ export default function PacientTable() {
           </Button>
         </AddSearch>
       </SearchContainer>
-      <PacientModal open={modalOpen} handleClose={handleCloseModal} />
+      <PacientModal
+        open={modalOpen}
+        handleClose={handleCloseModal}
+        editingPatientData={editingPatientData}
+      />
       <Modal
         open={deleteModalOpen}
         onClose={handleCloseDeleteModal}
@@ -359,7 +380,21 @@ export default function PacientTable() {
                       open={Boolean(anchorEl)}
                       onClose={handleClose}
                     >
-                      <MenuItem onClick={handleClose}>Editar</MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          handleClose();
+                          const indexToEdit = parseInt(
+                            anchorEl?.getAttribute("data-index") || "0",
+                            10
+                          );
+                          const patientToEdit = filteredRows[indexToEdit];
+                          setEditingPatientData(patientToEdit);
+                          handleOpenModal();
+                        }}
+                      >
+                        Editar
+                      </MenuItem>
+
                       <MenuItem onClick={handleOpenDeleteModal}>
                         Excluir
                       </MenuItem>

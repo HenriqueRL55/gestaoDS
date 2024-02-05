@@ -1,5 +1,5 @@
 /* React Hooks */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 /* Material UI Components */
 import Modal from "@mui/material/Modal";
@@ -45,9 +45,32 @@ import {
 } from "./modal.styles";
 
 /* TypeScript Interfaces*/
+interface Data {
+  id: number;
+  paciente: string;
+  cpf: any;
+  nascimento: any;
+  email: string;
+  cidade: string;
+  apelido: string;
+  nacionalidade: string;
+  rg: string;
+  genero: string;
+  estadoCivil: string;
+  observacoes: string;
+  cep: string;
+  uf: string;
+  endereco: string;
+  numero: any;
+  bairro: string;
+  complemento: string;
+  actions: JSX.Element;
+}
+
 interface PacientModalProps {
   open: boolean;
   handleClose: () => void;
+  editingPatientData: Data | null;
 }
 
 interface TabPanelProps {
@@ -84,7 +107,11 @@ function a11yProps(index: number) {
   };
 }
 
-export default function PacientModal({ open, handleClose }: PacientModalProps) {
+export default function PacientModal({
+  open,
+  handleClose,
+  editingPatientData,
+}: PacientModalProps) {
   /* UseStates */
   const [value, setValue] = useState(0);
   const [pacientData, setPacientData] = useState({
@@ -109,6 +136,31 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
   const [loadingCEP, setLoadingCEP] = useState(false);
   const [cepBeingEdited, setCepBeingEdited] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    // Preenche os campos do formulário com os dados do paciente em edição
+    if (editingPatientData) {
+      setPacientData({
+        paciente: editingPatientData.paciente || "",
+        apelido: editingPatientData.apelido || "",
+        nacionalidade: editingPatientData.nacionalidade || "",
+        nascimento: editingPatientData.nascimento || null,
+        cpf: editingPatientData.cpf || "",
+        email: editingPatientData.email || "",
+        rg: editingPatientData.rg || "",
+        genero: editingPatientData.genero || "",
+        estadoCivil: editingPatientData.estadoCivil || "",
+        observacoes: editingPatientData.observacoes || "",
+        cep: editingPatientData.cep || "",
+        cidade: editingPatientData.cidade || "",
+        uf: editingPatientData.uf || "",
+        endereco: editingPatientData.endereco || "",
+        numero: editingPatientData.numero || "",
+        bairro: editingPatientData.bairro || "",
+        complemento: editingPatientData.complemento || "",
+      });
+    }
+  }, [editingPatientData]);
 
   // Função para buscar detalhes do CEP
   const fetchCEPDetails = async (cep: string) => {
