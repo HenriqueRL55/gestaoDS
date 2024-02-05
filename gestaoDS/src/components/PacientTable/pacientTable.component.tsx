@@ -6,7 +6,6 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
-import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import { FormControl, OutlinedInput, InputAdornment } from "@mui/material";
@@ -15,12 +14,29 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import Menu from "@mui/material/Menu";
 import Modal from "@mui/material/Modal";
 import MenuItem from "@mui/material/MenuItem";
+import CloseIcon from "@mui/icons-material/Close";
+
+import DeleteIconModal from "../../assets/DeleteIconModal.png";
 
 import PacientModal from "../Modal/modal.component";
 import {
   SearchContainer,
   AddSearch,
   TitlePacientList,
+  ModalDeleteContainer,
+  InsideContainer,
+  Top,
+  Middle,
+  Bottom,
+  DeleteTitle,
+  CloseModalIcon,
+  ImageModal,
+  Text1,
+  Text2,
+  CancelButton,
+  Delete,
+  Container,
+  NoData,
 } from "./pacientTable.styles";
 
 interface Data {
@@ -65,7 +81,9 @@ function EnhancedTableHead(props: EnhancedTableProps) {
   };
 
   return (
-    <TableHead sx={{ borderTop: "1px solid rgba(224, 224, 224, 1)" }}>
+    <TableHead
+      sx={{ borderTop: "1px solid rgba(224, 224, 224, 1)", overflow: "auto" }}
+    >
       <TableRow>
         {headCells.map((headCell) => (
           <TableCell
@@ -100,13 +118,35 @@ export default function PacientTable() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
- 
   useEffect(() => {
     const storedPacients = localStorage.getItem("pacientData");
     if (storedPacients) {
       setPacients(JSON.parse(storedPacients));
     }
   }, []);
+
+  const DeletePacient = () => {
+    // Obtém o índice do paciente a ser excluído
+    const indexToDelete = parseInt(
+      anchorEl?.getAttribute("data-index") || "0",
+      10
+    );
+
+    // Faz uma cópia do array de pacientes
+    const updatedPacients = [...pacients];
+
+    // Remove o paciente do array
+    updatedPacients.splice(indexToDelete, 1);
+
+    // Atualiza o estado com a nova lista de pacientes
+    setPacients(updatedPacients);
+
+    // Atualiza o localStorage
+    localStorage.setItem("pacientData", JSON.stringify(updatedPacients));
+
+    // Fecha o modal de exclusão
+    handleCloseDeleteModal();
+  };
 
   const handleClick = (event: React.MouseEvent<SVGSVGElement>) => {
     setAnchorEl(event.currentTarget as unknown as HTMLElement);
@@ -142,7 +182,7 @@ export default function PacientTable() {
   };
 
   return (
-    <Paper sx={{ width: "100%" }}>
+    <Container>
       <SearchContainer>
         <TitlePacientList>Listagem de pacientes</TitlePacientList>
         <AddSearch>
@@ -197,50 +237,95 @@ export default function PacientTable() {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <div>teste</div>
+        <ModalDeleteContainer>
+          <InsideContainer>
+            <Top>
+              <DeleteTitle>Excluir paciente?</DeleteTitle>
+              <CloseModalIcon>
+                <CloseIcon onClick={handleCloseDeleteModal} />
+              </CloseModalIcon>
+            </Top>
+            <Middle>
+              <ImageModal src={DeleteIconModal} />
+              <Text1>
+                Tem certeza que deseja excluir o paciente selecionado?
+              </Text1>
+              <Text2>Essa ação não poderá ser desfeita.</Text2>
+            </Middle>
+            <Bottom>
+              <CancelButton onClick={handleCloseDeleteModal}>
+                Cancelar
+              </CancelButton>
+              <Delete
+                onClick={() => {
+                  DeletePacient();
+                  handleClose();
+                }}
+              >
+                Excluir
+              </Delete>
+            </Bottom>
+          </InsideContainer>
+        </ModalDeleteContainer>
       </Modal>
-      <TableContainer sx={{ maxHeight: "30rem" }}>
+      <TableContainer>
         <Table aria-labelledby="tableTitle" size="medium">
           <EnhancedTableHead
             order={order}
             orderBy={orderBy}
             onRequestSort={handleRequestSort}
           />
-          {filteredRows.map((row, index) => (
+          {filteredRows.length === 0 ? (
             <TableBody>
-              <TableRow key={row.id}>
-                <TableCell sx={{ color: "#136CDC", fontWeight: "400" }}>
-                  {row.paciente}
-                </TableCell>
-                <TableCell>{row.cpf}</TableCell>
-                <TableCell>
-                  {new Date(row.nascimento).toLocaleDateString("pt-BR")}
-                </TableCell>
-                <TableCell>{row.email}</TableCell>
-                <TableCell>{row.cidade}</TableCell>
-                <TableCell>
-                  <MoreHorizIcon
-                    aria-controls={`simple-menu-${index}`}
-                    aria-haspopup="true"
-                    onClick={handleClick}
-                    sx={{ cursor: "pointer" }}
-                  />
-                  <Menu
-                    id={`simple-menu-${index}`}
-                    anchorEl={anchorEl}
-                    keepMounted
-                    open={Boolean(anchorEl)}
-                    onClose={handleClose}
-                  >
-                    <MenuItem onClick={handleClose}>Editar</MenuItem>
-                    <MenuItem onClick={handleOpenDeleteModal}>Excluir</MenuItem>
-                  </Menu>
-                </TableCell>
-              </TableRow>
+              {" "}
+              <NoData />
             </TableBody>
-          ))}
+          ) : (
+            filteredRows.map((row, index) => (
+              <TableBody>
+                <TableRow key={row.id}>
+                  <TableCell sx={{ color: "#136CDC", fontWeight: "400" }}>
+                    {row.paciente}
+                  </TableCell>
+                  <TableCell>{row.cpf}</TableCell>
+                  <TableCell>
+                    {new Date(row.nascimento).toLocaleDateString("pt-BR")}
+                  </TableCell>
+                  <TableCell>{row.email}</TableCell>
+                  <TableCell>{row.cidade}</TableCell>
+                  <TableCell>
+                    <MoreHorizIcon
+                      aria-controls={`simple-menu-${index}`}
+                      aria-haspopup="true"
+                      onClick={(event) => {
+                        handleClick(event);
+            
+                        event.currentTarget.setAttribute(
+                          "data-index",
+                          index.toString()
+                        );
+                      }}
+                      sx={{ cursor: "pointer" }}
+                    />
+                    <Menu
+                      id={`simple-menu-${index}`}
+                      anchorEl={anchorEl}
+                      keepMounted
+                      open={Boolean(anchorEl)}
+                      onClose={handleClose}
+                    >
+                      <MenuItem onClick={handleClose}>Editar</MenuItem>
+                      <MenuItem onClick={handleOpenDeleteModal}>
+                        Excluir
+                      </MenuItem>
+                    </Menu>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            ))
+          )}
         </Table>
       </TableContainer>
-    </Paper>
+    </Container>
   );
 }

@@ -10,8 +10,8 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #136cdc; 
-  border-radius: 4px; 
+  background-color: #136cdc;
+  border-radius: 4px;
 }
 
 ::-moz-scrollbar {

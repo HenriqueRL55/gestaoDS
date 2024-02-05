@@ -24,7 +24,7 @@ export const BasicInformationContainer = styled.div`
     "Photo Photo Photo"
     "Pacient NickName Nacionality"
     "Birthday CPF RG"
-    "Gender Status Status"
+    "Gender Status invisible"
     "Observation Observation Observation"
     "Button Button Button";
   gap: 20px 50px;
@@ -55,6 +55,10 @@ export const BasicInformationContainer = styled.div`
       "Button";
     grid-template-columns: 1fr;
     gap: 12px;
+  }
+  @media (max-width: 600px) {
+    display: flex;
+    flex-direction: column;
   }
 `;
 
@@ -153,9 +157,20 @@ export const ContactContainer = styled.div`
     "SubmitButton SubmitButton SubmitButton";
   gap: 20px 50px;
   grid-template-rows: 1fr 1fr 1fr 3fr;
-  @media (max-width: 1200px) {
-  }
+
   @media (max-width: 850px) {
+    grid-template-areas:
+      "CEP City "
+      "UF Adress "
+      "Number Neighb"
+      "Complement Complement "
+      "SubmitButton SubmitButton ";
+    grid-template-rows: 1fr 1fr 1fr 1fr 3fr;
+  }
+
+  @media (max-width: 600px) {
+    display: flex;
+    flex-direction: column;
   }
 `;
 

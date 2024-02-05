@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import Modal from "@mui/material/Modal";
-import { FormControl, OutlinedInput } from "@mui/material";
+import { FormControl, OutlinedInput, CircularProgress } from "@mui/material";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
@@ -9,7 +9,6 @@ import Box from "@mui/material/Box";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import dayjs, { Dayjs } from "dayjs";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -80,7 +79,6 @@ function a11yProps(index: number) {
 
 export default function PacientModal({ open, handleClose }: PacientModalProps) {
   const [value, setValue] = useState(0);
-  const [valueDate, setValueDate] = useState<Dayjs | null>(dayjs());
   const [pacientData, setPacientData] = useState({
     paciente: "",
     apelido: "",
@@ -100,6 +98,54 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
     bairro: "",
     complemento: "",
   });
+  const [loadingCEP, setLoadingCEP] = useState(false);
+  const [cepBeingEdited, setCepBeingEdited] = useState(false);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+
+  // Função para buscar detalhes do CEP
+  const fetchCEPDetails = async (cep: string) => {
+    try {
+      setLoadingCEP(true);
+
+      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const data = await response.json();
+
+      if (data.erro) {
+        console.error("CEP não encontrado");
+      } else {
+        setPacientData((prevData) => ({
+          ...prevData,
+          cidade: data.localidade,
+          uf: data.uf,
+          endereco: data.logradouro,
+          bairro: data.bairro,
+        }));
+      }
+    } catch (error) {
+      console.error("Erro ao buscar detalhes do CEP", error);
+    } finally {
+      setLoadingCEP(false);
+    }
+  };
+
+  const handleCEPChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const cep = event.target.value.replace(/\D/g, "");
+    setCepBeingEdited(true);
+
+    setPacientData((prevData) => ({
+      ...prevData,
+      cep: cep,
+    }));
+
+    // Se o CEP tiver 8 dígitos, busca automaticamente os detalhes do CEP
+    if (cep.length === 8 && !cepBeingEdited) {
+      fetchCEPDetails(cep);
+    }
+  };
+
+  const handleCEPBlur = () => {
+    setCepBeingEdited(false);
+  };
 
   const handleSubmit = () => {
     const existingDataString = localStorage.getItem("pacientData");
@@ -109,9 +155,17 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
       existingData = [];
     }
 
-    const newData = [...existingData, pacientData];
-    localStorage.setItem("pacientData", JSON.stringify(newData));
+    if (editingIndex !== null) {
+  
+      existingData[editingIndex] = pacientData;
+    } else {
+  
+      existingData = [...existingData, pacientData];
+    }
+
+    localStorage.setItem("pacientData", JSON.stringify(existingData));
     handleClose();
+    setEditingIndex(null);
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -155,21 +209,29 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
             textTransform: "capitalize",
           }}
         >
-          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+          <Box sx={{}}>
             <Tabs
               value={value}
               onChange={handleChange}
+              sx={{ borderBottom: 1, borderColor: "divider" }}
+              TabIndicatorProps={{
+                style: {
+                  backgroundColor: "#510972",
+                },
+              }}
               aria-label="basic tabs example"
             >
               <Tab
                 sx={{ textTransform: "capitalize" }}
                 label="Informações Básicas"
                 {...a11yProps(0)}
+                style={value === 0 ? { color: "#510972" } : {}}
               />
               <Tab
                 sx={{ textTransform: "capitalize" }}
                 label="Contato"
                 {...a11yProps(1)}
+                style={value === 1 ? { color: "#510972" } : {}}
               />
             </Tabs>
           </Box>
@@ -275,7 +337,7 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
                     "Divorciado",
                     "Viúvo",
                   ]}
-                  sx={{ width: "19.5rem" }}
+                  sx={{ width: "100%" }}
                   value={pacientData.estadoCivil}
                   onChange={(event, newValue) =>
                     handleAutocompleteChange(event, newValue, "estadoCivil")
@@ -311,9 +373,11 @@ export default function PacientModal({ open, handleClose }: PacientModalProps) {
                     id="cep"
                     placeholder="Digite"
                     value={pacientData.cep}
-                    onChange={handleInputChange}
+                    onChange={handleCEPChange}
+                    onBlur={handleCEPBlur}
                   />
                 </FormControl>
+                {loadingCEP && <CircularProgress size={24} />}
               </CEP>
               <City>
                 <FieldTitle>Cidade:</FieldTitle>
