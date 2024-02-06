@@ -36,7 +36,9 @@ Agora, o servidor deve estar rodando localmente na sua máquina. Abra o navegado
 
 ## Avisos
 
-O projeto está rodando localmente, então a tabela está iniciando vazia, cadastre pacientes para visualizar as funcionalidades do sistema!
+1. O projeto está rodando localmente, então a tabela está iniciando vazia, cadastre pacientes para visualizar as funcionalidades do sistema!
+
+2. O Campo de Email não foi feito pois conforme constado no desafio era necessário fidelidade ao design onde no mesmo não possuia na hora de criar o paciente.
 
 ## Licença
 

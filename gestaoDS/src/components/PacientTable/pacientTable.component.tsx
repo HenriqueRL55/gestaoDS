@@ -141,9 +141,6 @@ export default function PacientTable() {
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [selectedPatientIndex, setSelectedPatientIndex] = useState<
-    number | null
-  >(null);
   const [editingPatientData, setEditingPatientData] = useState<Data | null>(
     null
   );

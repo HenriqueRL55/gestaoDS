@@ -20,7 +20,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 /* MUI Icons */
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
-/* Dayjs */
+/* Biblioteca Dayjs */
 import dayjs from "dayjs";
 
 /* Styled Components */
@@ -52,10 +52,9 @@ import {
 
 /* TypeScript Interfaces*/
 interface Data {
-  id: number;
   paciente: string;
   cpf: any;
-  nascimento: any;
+  nascimento: string | null;
   email: string;
   cidade: string;
   apelido: string;
@@ -124,7 +123,7 @@ export default function PacientModal({
     paciente: "",
     apelido: "",
     nacionalidade: "",
-    nascimento: null,
+    nascimento: "" as string | null,
     cpf: "",
     email: "",
     rg: "",
@@ -167,6 +166,59 @@ export default function PacientModal({
       });
     }
   }, [editingPatientData]);
+
+  // Função chamada quando o botão "Salvar" é clicado durante a edição
+  const handleEdit = () => {
+    if (editingPatientData) {
+      const existingDataString = localStorage.getItem("pacientData");
+      let existingData: Data[] = existingDataString
+        ? JSON.parse(existingDataString)
+        : [];
+
+      if (!Array.isArray(existingData)) {
+        existingData = [];
+      }
+
+      // Obtém o índice do paciente em edição diretamente de editingPatientData
+      const editedIndex = existingData.findIndex(
+        (patient) => patient.paciente === editingPatientData.paciente
+      );
+
+      if (editedIndex !== -1) {
+        // Cria um novo objeto com todas as propriedades necessárias, incluindo 'id' e 'actions'
+        const updatedPatientData: Data = {
+          paciente: pacientData.paciente,
+          apelido: pacientData.apelido,
+          nacionalidade: pacientData.nacionalidade,
+          nascimento: pacientData.nascimento,
+          cpf: pacientData.cpf,
+          email: pacientData.email,
+          rg: pacientData.rg,
+          genero: pacientData.genero,
+          estadoCivil: pacientData.estadoCivil,
+          observacoes: pacientData.observacoes,
+          cep: pacientData.cep,
+          cidade: pacientData.cidade,
+          uf: pacientData.uf,
+          endereco: pacientData.endereco,
+          numero: pacientData.numero,
+          bairro: pacientData.bairro,
+          complemento: pacientData.complemento,
+          actions: editingPatientData.actions,
+        };
+
+        existingData[editedIndex] = updatedPatientData;
+
+        // Atualiza o armazenamento local com os dados atualizados do paciente
+        localStorage.setItem("pacientData", JSON.stringify(existingData));
+        handleClose();
+        setEditingIndex(null);
+        window.location.reload();
+      } else {
+        console.error("Paciente em edição não encontrado na lista.");
+      }
+    }
+  };
 
   // Função para buscar detalhes do CEP
   const fetchCEPDetails = async (cep: string) => {
@@ -533,7 +585,11 @@ export default function PacientModal({
                   />
                 </FormControl>
               </Complement>
-              <SubmitButton onClick={handleSubmit}>Salvar</SubmitButton>
+              <SubmitButton
+                onClick={editingPatientData ? handleEdit : handleSubmit}
+              >
+                Salvar
+              </SubmitButton>
             </ContactContainer>
           </CustomTabPanel>
         </Box>
