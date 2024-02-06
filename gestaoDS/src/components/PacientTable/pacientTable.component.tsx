@@ -354,7 +354,7 @@ export default function PacientTable() {
                   <TableCell>
                     {new Date(row.nascimento).toLocaleDateString("pt-BR")}
                   </TableCell>
-                  <TableCell>{row.email}</TableCell>
+                  <TableCell>teste@gestaods.com.br</TableCell>
                   <TableCell>{row.cidade}</TableCell>
                   <TableCell>
                     <MoreHorizIcon
